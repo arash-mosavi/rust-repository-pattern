@@ -1,0 +1,11 @@
+[package]
+name = "baserepository"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+tokio.workspace = true
+
+# Internal workspace dependencies
+pkg = { workspace = true }

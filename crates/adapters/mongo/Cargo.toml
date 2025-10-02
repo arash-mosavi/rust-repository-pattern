@@ -1,0 +1,14 @@
+[package]
+name = "mongo-adapter"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+mongodb.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+
+# Internal workspace dependencies
+pkg = { workspace = true }
+core-db = { workspace = true }
+baserepository = { workspace = true }

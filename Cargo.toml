@@ -1,27 +1,59 @@
-[package]
-name = "repository-pattern"
+[workspace]
+resolver = "2"
+
+members = [
+    "apps/server",
+    "crates/core-config",
+    "crates/core-db",
+    "crates/adapters/baserepository",
+    "crates/adapters/postgres",
+    "crates/adapters/mongo",
+    "crates/pkg",
+    "crates/modules/users",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/arash-mosavi/rust-repository-pattern"
 
-[dependencies]
+[workspace.dependencies]
 tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-uuid = { version = "1.0", features = ["v4", "serde"] }
-thiserror = "1.0"
-async-trait = "0.1"
 sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "postgres", "uuid", "migrate", "chrono"] }
-dotenvy = "0.15"
+mongodb = { version = "2.8", default-features = false, features = ["tokio-runtime"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1.0"
+anyhow = "1.0"
+dotenvy = "0.15"
+config = "0.14"
+validator = { version = "0.18", features = ["derive"] }
 regex = "1.10"
 once_cell = "1.19"
-
-# HTTP Server (Echo-like framework)
 axum = "0.7"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+core-config = { path = "crates/core-config" }
+core-db = { path = "crates/core-db" }
+baserepository = { path = "crates/adapters/baserepository" }
+postgres-adapter = { path = "crates/adapters/postgres" }
+mongo-adapter = { path = "crates/adapters/mongo" }
+pkg = { path = "crates/pkg" }
+users-module = { path = "crates/modules/users" }
 
-# Validation (similar to ozzo-validation/class-validator)
-validator = { version = "0.18", features = ["derive"] }
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

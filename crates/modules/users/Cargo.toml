@@ -1,0 +1,42 @@
+[package]
+name = "users-module"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Async
+tokio.workspace = true
+async-trait.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Types
+uuid.workspace = true
+chrono.workspace = true
+
+# Validation
+validator.workspace = true
+
+# Error handling
+thiserror.workspace = true
+
+# Database
+sqlx.workspace = true
+
+# HTTP (for delivery layer)
+axum.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+
+# Internal workspace dependencies
+pkg = { workspace = true }
+core-config = { workspace = true }
+core-db = { workspace = true }
+baserepository = { workspace = true }
+postgres-adapter = { workspace = true, optional = true }
+
+[features]
+default = []
+postgres = ["postgres-adapter"]

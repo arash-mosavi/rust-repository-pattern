@@ -1,6 +1,6 @@
 # Repository Pattern in Rust with Domain-Driven Design
 
-A comprehensive implementation of the Repository Pattern in Rust following Domain-Driven Design (DDD) principles, demonstrating clean architecture with async/await support.
+A comprehensive implementation of the Repository Pattern in Rust following Domain-Driven Design (DDD) principles with **modular workspace architecture**. Features clean separation of concerns, async/await support, and **per-module database migrations**.
 
 ## Overview
 
@@ -545,8 +545,17 @@ async fn create_user(
 
 ## Documentation
 
-- **[README.md](README.md)** - This file
-- **[DDD_STRUCTURE.md](DDD_STRUCTURE.md)** - Complete DDD architecture guide
+### Workspace & Architecture
+- **[WORKSPACE_MIGRATION.md](docs/WORKSPACE_MIGRATION.md)** - Complete workspace structure guide
+- **[MIGRATION_COMPLETE.md](docs/MIGRATION_COMPLETE.md)** - Migration summary & quick start
+
+### Database Migrations
+- **[CODE_FIRST_MIGRATIONS.md](docs/CODE_FIRST_MIGRATIONS.md)** - **Code-first migrations with tracking** ⭐⭐⭐
+- **[MIGRATIONS_QUICKREF.md](docs/MIGRATIONS_QUICKREF.md)** - Quick reference card
+- **[MODULE_MIGRATIONS.md](docs/MODULE_MIGRATIONS.md)** - Module-based pattern guide
+
+### Legacy Documentation
+- **[DDD_STRUCTURE.md](DDD_STRUCTURE.md)** - Complete DDD architecture guide (old structure)
 - **[POSTGRES_GUIDE.md](POSTGRES_GUIDE.md)** - PostgreSQL setup instructions
 - **[POSTGRES_INTEGRATION.md](POSTGRES_INTEGRATION.md)** - Integration details
 - **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide

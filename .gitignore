@@ -45,7 +45,7 @@ tarpaulin-report.html
 cobertura.xml
 *.profraw
 *.profdata
-
+docs
 
 /docs/_build
 /target/doc
