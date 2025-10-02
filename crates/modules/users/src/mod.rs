@@ -1,4 +1,3 @@
-// User module following Go-style structure
 pub mod constants;
 pub mod domain;
 pub mod delivery;

@@ -1,11 +1,6 @@
-/// Users module database migrations using code-first migration system
-/// 
-/// This file contains structured migrations for the users module.
-/// Each migration tracks its version, has a name, and includes SQL.
 
 use core_db::Migration;
 
-/// Migration 1: Create the users table with indexes and triggers
 const MIGRATION_CREATE_USERS_TABLE: &str = r#"
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
@@ -36,32 +31,13 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 "#;
 
-/// Example: Migration 2 (future)
-/// Uncomment and modify when you need to add new features
-/*
-const MIGRATION_ADD_USER_ROLES: &str = r#"
--- Add role and is_active columns to users
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user',
-ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
-
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active);
-"#;
-*/
-
-/// All migrations for the users module
-/// These will be executed in order by version number
 pub const MIGRATIONS: &[Migration] = &[
     Migration::new(
-        "users",                         // module name
-        1,                               // version
-        "create_users_table",            // migration name
-        MIGRATION_CREATE_USERS_TABLE,    // SQL to execute
+        "users",                         
+        1,                               
+        "create_users_table",            
+        MIGRATION_CREATE_USERS_TABLE,    
     ),
-    // Add future migrations here:
-    // Migration::new("users", 2, "add_user_roles", MIGRATION_ADD_USER_ROLES),
-    // Migration::new("users", 3, "add_email_verification", MIGRATION_ADD_EMAIL_VERIFICATION),
 ];
 
 #[cfg(test)]
@@ -71,7 +47,7 @@ mod tests {
     #[test]
     fn test_migrations_array_not_empty() {
         assert!(!MIGRATIONS.is_empty());
-        assert_eq!(MIGRATIONS.len(), 1); // Update this as you add more migrations
+        assert_eq!(MIGRATIONS.len(), 1); 
     }
 
     #[test]

@@ -1,7 +1,6 @@
 use thiserror::Error;
 use uuid::Uuid;
 
-/// Custom error types for user module operations
 #[derive(Error, Debug)]
 pub enum UserError {
     #[error("User with ID {0} not found")]
@@ -20,7 +19,6 @@ pub enum UserError {
     InternalError(String),
 }
 
-/// Result type alias for user operations
 pub type UserResult<T> = Result<T, UserError>;
 
 impl From<String> for UserError {

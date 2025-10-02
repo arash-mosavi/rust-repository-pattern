@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use chrono::{DateTime, Utc};
 
-/// User entity representing a user in the system
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, sqlx::FromRow)]
 pub struct User {
     pub id: Uuid,
@@ -15,7 +14,6 @@ pub struct User {
 }
 
 impl User {
-    /// Create a new user with a generated UUID
     pub fn new(username: String, email: String, full_name: String, age: Option<i32>) -> Self {
         let now = Utc::now();
         Self {
@@ -29,7 +27,6 @@ impl User {
         }
     }
 
-    /// Validate user data
     pub fn validate(&self) -> Result<(), String> {
         if self.username.is_empty() {
             return Err("Username cannot be empty".to_string());

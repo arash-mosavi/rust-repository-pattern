@@ -4,8 +4,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-/// Base repository trait that all repositories can use
-/// This provides common CRUD operations
 #[async_trait]
 pub trait BaseRepository<T, ID>
 where
@@ -21,7 +19,6 @@ where
     async fn count(&self) -> RepositoryResult<usize>;
 }
 
-/// In-memory base repository for testing and development
 #[derive(Debug)]
 pub struct InMemoryBaseRepository<T, ID>
 where

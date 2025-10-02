@@ -7,7 +7,6 @@ edition.workspace = true
 sqlx.workspace = true
 async-trait.workspace = true
 
-# Internal workspace dependencies
 pkg = { workspace = true }
 core-db = { workspace = true }
 baserepository = { workspace = true }

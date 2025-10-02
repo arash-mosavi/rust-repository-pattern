@@ -7,5 +7,4 @@ edition.workspace = true
 async-trait.workspace = true
 tokio.workspace = true
 
-# Internal workspace dependencies
 pkg = { workspace = true }

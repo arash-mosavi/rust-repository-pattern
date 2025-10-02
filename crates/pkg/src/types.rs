@@ -1,10 +1,8 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-/// Generic ID type for entities
 pub type EntityId = Uuid;
 
-/// Pagination request parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PaginationRequest {
     pub page: u32,
@@ -30,7 +28,6 @@ impl PaginationRequest {
     }
 }
 
-/// Pagination response metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PaginationResponse<T> {
     pub items: Vec<T>,
@@ -53,7 +50,6 @@ impl<T> PaginationResponse<T> {
     }
 }
 
-/// Generic API response wrapper
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiResponse<T> {
     pub success: bool,
@@ -91,7 +87,6 @@ impl<T> ApiResponse<T> {
     }
 }
 
-/// Sorting direction
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum SortDirection {
@@ -105,7 +100,6 @@ impl Default for SortDirection {
     }
 }
 
-/// Generic sort request
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SortRequest {
     pub field: String,

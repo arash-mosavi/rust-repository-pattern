@@ -15,8 +15,6 @@ use crate::delivery::http::dto::{CreateUserDto, UpdateUserDto, UserResponse, Api
 use crate::repositories::UserRepository;
 use crate::service::UserService;
 
-/// HTTP Handler for user operations (similar to Echo handlers in Go)
-/// This uses Axum for HTTP routing and handling
 pub struct HttpUserHandler<R: UserRepository> {
     service: Arc<UserService<R>>,
 }
@@ -27,7 +25,6 @@ impl<R: UserRepository> HttpUserHandler<R> {
     }
 }
 
-/// Query parameters for filtering users
 #[derive(Debug, Deserialize, Validate)]
 pub struct AgeRangeQuery {
     #[validate(range(min = 1, max = 150))]
@@ -36,14 +33,12 @@ pub struct AgeRangeQuery {
     pub max_age: i32,
 }
 
-/// Query parameters for username search
 #[derive(Debug, Deserialize, Validate)]
 pub struct UsernameQuery {
     #[validate(length(min = 1, max = 50))]
     pub username: String,
 }
 
-/// Convert User entity to UserResponse DTO
 impl From<User> for UserResponse {
     fn from(user: User) -> Self {
         Self {
@@ -58,14 +53,12 @@ impl From<User> for UserResponse {
     }
 }
 
-/// Custom error response
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
     pub error: String,
     pub details: Option<Vec<String>>,
 }
 
-/// Wrapper for RepositoryError to implement IntoResponse (orphan rule compliance)
 pub struct AppError(pub RepositoryError);
 
 impl From<RepositoryError> for AppError {
@@ -74,7 +67,6 @@ impl From<RepositoryError> for AppError {
     }
 }
 
-/// Convert AppError to HTTP response
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, message, details) = match self.0 {
@@ -129,17 +121,10 @@ impl IntoResponse for AppError {
     }
 }
 
-// ============================================================================
-// HTTP Handler Functions (similar to Echo handlers in Go)
-// ============================================================================
-
-/// POST /api/users - Create a new user
-/// Similar to: func CreateUser(c echo.Context) error
 pub async fn create_user<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
     Json(dto): Json<CreateUserDto>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Validate DTO (similar to ozzo-validation or class-validator)
     dto.validate()
         .map_err(|e| AppError(RepositoryError::ValidationError(format!("{}", e))))?;
 
@@ -149,8 +134,6 @@ pub async fn create_user<R: UserRepository>(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-/// GET /api/users - Get all users
-/// Similar to: func GetAllUsers(c echo.Context) error
 pub async fn get_all_users<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -170,8 +153,6 @@ pub async fn get_all_users<R: UserRepository>(
     Ok(Json(response))
 }
 
-/// GET /api/users/:id - Get user by ID
-/// Similar to: func GetUser(c echo.Context) error
 pub async fn get_user<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
     Path(id): Path<Uuid>,
@@ -182,14 +163,11 @@ pub async fn get_user<R: UserRepository>(
     Ok(Json(response))
 }
 
-/// PUT /api/users/:id - Update user
-/// Similar to: func UpdateUser(c echo.Context) error
 pub async fn update_user<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
     Path(id): Path<Uuid>,
     Json(dto): Json<UpdateUserDto>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Validate DTO
     dto.validate()
         .map_err(|e| AppError(RepositoryError::ValidationError(format!("{}", e))))?;
 
@@ -199,8 +177,6 @@ pub async fn update_user<R: UserRepository>(
     Ok(Json(response))
 }
 
-/// DELETE /api/users/:id - Delete user
-/// Similar to: func DeleteUser(c echo.Context) error
 pub async fn delete_user<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
     Path(id): Path<Uuid>,
@@ -215,13 +191,10 @@ pub async fn delete_user<R: UserRepository>(
     Ok(Json(response))
 }
 
-/// GET /api/users/search/username?username=john - Search by username
-/// Similar to: func FindByUsername(c echo.Context) error
 pub async fn find_by_username<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
     Query(query): Query<UsernameQuery>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Validate query parameters
     query.validate()
         .map_err(|e| AppError(RepositoryError::ValidationError(format!("{}", e))))?;
 
@@ -238,13 +211,10 @@ pub async fn find_by_username<R: UserRepository>(
     }
 }
 
-/// GET /api/users/filter/age?min_age=18&max_age=65 - Filter by age range
-/// Similar to: func FilterByAgeRange(c echo.Context) error
 pub async fn filter_by_age_range<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
     Query(query): Query<AgeRangeQuery>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Validate query parameters
     query.validate()
         .map_err(|e| AppError(RepositoryError::ValidationError(format!("{}", e))))?;
 
@@ -270,8 +240,6 @@ pub async fn filter_by_age_range<R: UserRepository>(
     Ok(Json(response))
 }
 
-/// GET /api/users/statistics - Get user statistics
-/// Similar to: func GetStatistics(c echo.Context) error
 pub async fn get_statistics<R: UserRepository>(
     State(handler): State<Arc<HttpUserHandler<R>>>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -286,7 +254,6 @@ pub async fn get_statistics<R: UserRepository>(
     Ok(Json(response))
 }
 
-/// GET /health - Health check endpoint
 pub async fn health_check() -> impl IntoResponse {
     Json(serde_json::json!({
         "status": "healthy",

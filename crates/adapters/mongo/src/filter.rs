@@ -1,7 +1,7 @@
 use mongodb::bson::{doc, Document};
 use serde::Serialize;
 
-/// Helper for building MongoDB filter documents
+
 pub struct MongoFilter {
     filter: Document,
 }

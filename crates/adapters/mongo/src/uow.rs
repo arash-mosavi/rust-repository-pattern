@@ -3,7 +3,6 @@ use mongodb::{Client, ClientSession};
 use core_db::UnitOfWork;
 use pkg::{RepositoryError, RepositoryResult};
 
-/// MongoDB Unit of Work implementation
 pub struct MongoUnitOfWork {
     client: Client,
     session: Option<ClientSession>,

@@ -7,21 +7,18 @@ use crate::domain::User;
 use crate::delivery::http::dto::{CreateUserDto, UpdateUserDto};
 use super::interface::UserRepository;
 
-/// In-memory implementation using BaseRepository (composition, not inheritance)
 #[derive(Debug, Clone)]
 pub struct InMemoryUserRepository {
     base: InMemoryBaseRepository<User, Uuid>,
 }
 
 impl InMemoryUserRepository {
-    /// Create a new in-memory user repository
     pub fn new() -> Self {
         Self {
             base: InMemoryBaseRepository::new(),
         }
     }
 
-    /// Create with initial data
     pub fn with_data(users: Vec<User>) -> Self {
         let repo = Self::new();
         Self {
@@ -29,7 +26,6 @@ impl InMemoryUserRepository {
         }
     }
 
-    /// Helper: Check for duplicate username
     async fn check_duplicate_username(&self, username: &str, exclude_id: Option<Uuid>) -> RepositoryResult<()> {
         let users = self.base.get_all().await?;
         for user in users {
@@ -42,7 +38,6 @@ impl InMemoryUserRepository {
         Ok(())
     }
 
-    /// Helper: Check for duplicate email
     async fn check_duplicate_email(&self, email: &str, exclude_id: Option<Uuid>) -> RepositoryResult<()> {
         let users = self.base.get_all().await?;
         for user in users {
@@ -56,7 +51,6 @@ impl InMemoryUserRepository {
     }
 }
 
-// Implement BaseRepository trait (common CRUD operations)
 #[async_trait]
 impl BaseRepository<User, Uuid> for InMemoryUserRepository {
     async fn find_by_id(&self, id: Uuid) -> RepositoryResult<Option<User>> {
@@ -68,27 +62,21 @@ impl BaseRepository<User, Uuid> for InMemoryUserRepository {
     }
 
     async fn save(&self, entity: User) -> RepositoryResult<User> {
-        // Validate before saving
         entity.validate()?;
         
-        // Check for duplicates
         self.check_duplicate_username(&entity.username, None).await?;
         self.check_duplicate_email(&entity.email, None).await?;
         
-        // Use base repository to save
         self.base.insert(entity.id, entity.clone()).await?;
         Ok(entity)
     }
 
     async fn update(&self, id: Uuid, entity: User) -> RepositoryResult<User> {
-        // Validate before updating
         entity.validate()?;
         
-        // Check for duplicates (excluding current user)
         self.check_duplicate_username(&entity.username, Some(id)).await?;
         self.check_duplicate_email(&entity.email, Some(id)).await?;
         
-        // Use base repository to update
         self.base.update_entity(id, entity).await
     }
 
@@ -105,7 +93,6 @@ impl BaseRepository<User, Uuid> for InMemoryUserRepository {
     }
 }
 
-// Implement UserRepository trait (user-specific operations)
 #[async_trait]
 impl UserRepository for InMemoryUserRepository {
     async fn find_by_username(&self, username: &str) -> RepositoryResult<Option<User>> {

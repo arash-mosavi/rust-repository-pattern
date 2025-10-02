@@ -1,31 +1,16 @@
-//! Code-First Database Migration System
-//! 
-//! This module provides a robust migration system that:
-//! - Tracks which migrations have been applied
-//! - Prevents re-running the same migration
-//! - Supports per-module versioning
-//! - Generates checksums for migration integrity
-//! - Provides idempotent migration execution
-
 use sqlx::PgPool;
 use std::collections::HashMap;
 use pkg::{RepositoryError, RepositoryResult};
 
-/// Represents a single database migration
 #[derive(Debug, Clone, Copy)]
 pub struct Migration {
-    /// Module name (e.g., "users", "products")
     pub module: &'static str,
-    /// Version number within the module (1, 2, 3...)
     pub version: i32,
-    /// Human-readable name (e.g., "create_users_table")
     pub name: &'static str,
-    /// SQL to execute
     pub sql: &'static str,
 }
 
 impl Migration {
-    /// Create a new migration
     pub const fn new(
         module: &'static str,
         version: i32,
@@ -40,24 +25,20 @@ impl Migration {
         }
     }
 
-    /// Generate a checksum for the migration SQL
-    /// This ensures migrations haven't been modified after being applied
     pub fn checksum(&self) -> String {
-        // Simple checksum based on SQL length and first/last chars
-        // In production, use a proper hash like SHA256
+        
+        
         let len = self.sql.len();
         let first = self.sql.chars().next().unwrap_or('0');
         let last = self.sql.chars().last().unwrap_or('0');
         format!("{}-{}-{}", len, first as u32, last as u32)
     }
 
-    /// Get unique identifier for this migration
     pub fn id(&self) -> String {
         format!("{}:version_{}", self.module, self.version)
     }
 }
 
-/// Migration tracking record from database
 #[derive(Debug)]
 struct AppliedMigration {
     module: String,
@@ -66,18 +47,15 @@ struct AppliedMigration {
     checksum: String,
 }
 
-/// Migration runner that manages database schema evolution
 pub struct MigrationRunner {
     pool: PgPool,
 }
 
 impl MigrationRunner {
-    /// Create a new migration runner
     pub fn new(pool: PgPool) -> Self {
         Self { pool }
     }
 
-    /// Initialize the migrations tracking table
     async fn ensure_migrations_table(&self) -> RepositoryResult<()> {
         let sql = r#"
         CREATE TABLE IF NOT EXISTS _schema_migrations (
@@ -111,7 +89,6 @@ impl MigrationRunner {
         Ok(())
     }
 
-    /// Get all applied migrations from the database
     async fn get_applied_migrations(&self) -> RepositoryResult<HashMap<String, AppliedMigration>> {
         let records = sqlx::query_as::<_, (String, i32, String, String)>(
             "SELECT module, version, name, checksum FROM _schema_migrations ORDER BY module, version"
@@ -141,7 +118,6 @@ impl MigrationRunner {
         Ok(migrations)
     }
 
-    /// Check if a migration has been applied
     async fn is_applied(&self, migration: &Migration) -> RepositoryResult<bool> {
         let count: (i64,) = sqlx::query_as(
             "SELECT COUNT(*) FROM _schema_migrations WHERE module = $1 AND version = $2"
@@ -159,7 +135,6 @@ impl MigrationRunner {
         Ok(count.0 > 0)
     }
 
-    /// Record that a migration has been applied
     async fn record_migration(
         &self,
         migration: &Migration,
@@ -187,7 +162,6 @@ impl MigrationRunner {
         Ok(())
     }
 
-    /// Run a single migration
     async fn run_migration(&self, migration: &Migration) -> RepositoryResult<i32> {
         let start = std::time::Instant::now();
 
@@ -198,7 +172,7 @@ impl MigrationRunner {
             migration.name
         );
 
-        // Execute the migration SQL
+        
         sqlx::raw_sql(migration.sql)
             .execute(&self.pool)
             .await
@@ -218,19 +192,18 @@ impl MigrationRunner {
         Ok(execution_time_ms)
     }
 
-    /// Run all pending migrations
     pub async fn run_migrations(&self, migrations: &[Migration]) -> RepositoryResult<()> {
-        // Ensure tracking table exists
+        
         self.ensure_migrations_table().await?;
 
-        // Get applied migrations
+        
         let applied = self.get_applied_migrations().await?;
 
         tracing::info!("📦 Starting migration check...");
         tracing::info!("   Found {} previously applied migrations", applied.len());
         tracing::info!("   Checking {} total migrations", migrations.len());
 
-        // Group migrations by module
+        
         let mut by_module: HashMap<&str, Vec<&Migration>> = HashMap::new();
         for migration in migrations {
             by_module
@@ -276,7 +249,6 @@ impl MigrationRunner {
         Ok(())
     }
 
-    /// Get migration status for all modules
     pub async fn get_status(&self) -> RepositoryResult<Vec<MigrationStatus>> {
         self.ensure_migrations_table().await?;
 
@@ -314,7 +286,6 @@ impl MigrationRunner {
     }
 }
 
-/// Migration status information
 #[derive(Debug)]
 pub struct MigrationStatus {
     pub module: String,
@@ -340,7 +311,7 @@ mod tests {
         let checksum1 = migration.checksum();
         let checksum2 = migration.checksum();
 
-        // Checksums should be consistent
+        
         assert_eq!(checksum1, checksum2);
         assert!(!checksum1.is_empty());
     }

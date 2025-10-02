@@ -15,7 +15,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["arash-mosavi <arashmousavi8131@gmail.com"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/arash-mosavi/rust-repository-pattern"
 

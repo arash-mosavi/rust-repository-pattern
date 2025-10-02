@@ -3,7 +3,7 @@ use sqlx::{PgPool, Transaction, Postgres};
 use core_db::UnitOfWork;
 use pkg::{RepositoryError, RepositoryResult};
 
-/// PostgreSQL Unit of Work implementation
+
 pub struct PostgresUnitOfWork {
     pool: PgPool,
     transaction: Option<Transaction<'static, Postgres>>,
@@ -37,8 +37,6 @@ impl UnitOfWork for PostgresUnitOfWork {
             .await
             .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?;
 
-        // SAFETY: We need to convert the transaction to 'static lifetime
-        // This is safe because we manage the transaction lifetime ourselves
         let tx_static: Transaction<'static, Postgres> = unsafe {
             std::mem::transmute(tx)
         };

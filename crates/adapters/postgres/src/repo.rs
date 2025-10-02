@@ -2,8 +2,8 @@ use async_trait::async_trait;
 use sqlx::{PgPool, Postgres, FromRow};
 use pkg::{RepositoryError, RepositoryResult};
 
-/// PostgreSQL base repository implementation
-/// Modules can use this for common database operations
+
+
 #[derive(Debug, Clone)]
 pub struct PostgresBaseRepository<T>
 where
@@ -34,7 +34,7 @@ where
         &self.table_name
     }
 
-    /// Execute a query and return a single optional result
+    
     pub async fn query_one<'q, Q>(
         &self,
         query: Q,
@@ -48,7 +48,7 @@ where
             .map_err(|e| RepositoryError::DatabaseError(e.to_string()))
     }
 
-    /// Execute a query and return all results
+    
     pub async fn query_all<'q, Q>(
         &self,
         query: Q,
@@ -62,7 +62,7 @@ where
             .map_err(|e| RepositoryError::DatabaseError(e.to_string()))
     }
 
-    /// Execute a query and return the number of affected rows
+    
     pub async fn execute<'q, Q>(
         &self,
         query: Q,
@@ -77,7 +77,7 @@ where
             .map_err(|e| RepositoryError::DatabaseError(e.to_string()))
     }
 
-    /// Execute a raw SQL query and return one result
+    
     pub async fn query_one_raw(&self, sql: &str) -> RepositoryResult<Option<T>> {
         sqlx::query_as::<_, T>(sql)
             .fetch_optional(&self.pool)
@@ -85,7 +85,7 @@ where
             .map_err(|e| RepositoryError::DatabaseError(e.to_string()))
     }
 
-    /// Execute a raw SQL query and return all results
+    
     pub async fn query_all_raw(&self, sql: &str) -> RepositoryResult<Vec<T>> {
         sqlx::query_as::<_, T>(sql)
             .fetch_all(&self.pool)
@@ -93,7 +93,7 @@ where
             .map_err(|e| RepositoryError::DatabaseError(e.to_string()))
     }
 
-    /// Execute a raw SQL command
+    
     pub async fn execute_raw(&self, sql: &str) -> RepositoryResult<u64> {
         sqlx::query(sql)
             .execute(&self.pool)

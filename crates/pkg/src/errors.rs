@@ -1,7 +1,6 @@
 use thiserror::Error;
 use uuid::Uuid;
 
-/// Custom error types for repository operations
 #[derive(Error, Debug)]
 pub enum RepositoryError {
     #[error("Entity with ID {0} not found")]
@@ -29,7 +28,6 @@ pub enum RepositoryError {
     BadRequest(String),
 }
 
-/// Result type alias for repository operations
 pub type RepositoryResult<T> = Result<T, RepositoryError>;
 
 impl From<String> for RepositoryError {

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::env;
 
-// Workspace crate imports
+
 use pkg::{init_logging, RepositoryError};
 use core_config::AppConfig;
 use core_db::DatabaseFactory;
@@ -13,16 +13,16 @@ use users_module::{
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Load environment variables
+
     dotenvy::dotenv().ok();
 
-    // Initialize logging
+
     init_logging();
 
-    // Load configuration
+
     let config = AppConfig::from_env()?;
 
-    // Check command line arguments
+
     let args: Vec<String> = env::args().collect();
     
     if args.len() > 1 {
@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     } else {
-        // Default: run HTTP server
+
         run_http_server(config).await
     }
 }
@@ -74,36 +74,18 @@ fn print_usage() {
 async fn run_http_server(config: AppConfig) -> Result<(), Box<dyn std::error::Error>> {
     tracing::info!("🚀 Starting User API Server...");
 
-    // Create repository and service
+
     let repository = Arc::new(InMemoryUserRepository::new());
     let service = Arc::new(UserService::new(repository));
 
-    // Create router with all HTTP endpoints
+
     let app = create_user_router(service);
 
-    // Start server
+
     let addr = format!("{}:{}", config.server.host, config.server.port);
     let listener = tokio::net::TcpListener::bind(&addr).await?;
 
     tracing::info!("✅ Server running on http://{}", addr);
-    println!("\n📋 Available endpoints:");
-    println!("  GET    /health                      - Health check");
-    println!("  GET    /api/users                   - Get all users");
-    println!("  POST   /api/users                   - Create user");
-    println!("  GET    /api/users/:id               - Get user by ID");
-    println!("  PUT    /api/users/:id               - Update user");
-    println!("  DELETE /api/users/:id               - Delete user");
-    println!("  GET    /api/users/search/username   - Search by username (query: ?username=john)");
-    println!("  GET    /api/users/filter/age        - Filter by age range (query: ?min_age=18&max_age=65)");
-    println!("  GET    /api/users/statistics        - Get statistics");
-    println!("\n📝 Example requests:");
-    println!("  curl http://localhost:{}/health", config.server.port);
-    println!("  curl http://localhost:{}/api/users", config.server.port);
-    println!("  curl -X POST http://localhost:{}/api/users \\", config.server.port);
-    println!("    -H 'Content-Type: application/json' \\");
-    println!("    -d '{{\"username\":\"john_doe\",\"email\":\"john@example.com\",\"full_name\":\"John Doe\",\"age\":30}}'");
-    println!();
-
     axum::serve(listener, app).await?;
 
     Ok(())
@@ -112,11 +94,11 @@ async fn run_http_server(config: AppConfig) -> Result<(), Box<dyn std::error::Er
 async fn run_cli_demo(_config: AppConfig) -> Result<(), Box<dyn std::error::Error>> {
     println!("=== Repository Pattern CLI Demo ===\n");
 
-    // Create the user service with in-memory repository
+
     let repository = Arc::new(InMemoryUserRepository::new());
     let service = Arc::new(UserService::new(repository));
 
-    // Run examples
+
     run_examples(service).await
 }
 
@@ -127,20 +109,20 @@ async fn run_migrations(config: AppConfig) -> Result<(), Box<dyn std::error::Err
 
     let pool = DatabaseFactory::create_postgres_pool(&config.database).await?;
     
-    // Collect all migrations from all modules
-    // The MigrationRunner will track which ones have been applied
+
+
     let all_migrations: Vec<_> = vec![
         users_module::USER_MIGRATIONS,
-        // Add new modules here as you create them:
-        // products_module::PRODUCT_MIGRATIONS,
-        // orders_module::ORDER_MIGRATIONS,
+
+
+
     ]
     .into_iter()
     .flatten()
     .copied()
     .collect();
     
-    // Create migration runner and execute migrations
+
     let runner = MigrationRunner::new(pool);
     runner.run_migrations(&all_migrations).await?;
 
@@ -152,7 +134,7 @@ async fn run_migrations(config: AppConfig) -> Result<(), Box<dyn std::error::Err
 async fn run_examples<R: users_module::repositories::UserRepository + Send + Sync>(
     service: Arc<UserService<R>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // Example 1: Create users
+
     println!("1. Creating users...");
     let user1_dto = CreateUserDto {
         username: "john_doe".to_string(),
@@ -184,7 +166,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
     let user3 = service.create_user(user3_dto).await?;
     println!("   Created user: {} (ID: {})\n", user3.username, user3.id);
 
-    // Example 2: Try to create a user with duplicate username
+
     println!("2. Trying to create user with duplicate username...");
     let duplicate_dto = CreateUserDto {
         username: "john_doe".to_string(),
@@ -201,18 +183,18 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
         Err(e) => println!("   Unexpected error: {}\n", e),
     }
 
-    // Example 3: Get user by ID
+
     println!("3. Getting user by ID...");
     let fetched_user = service.get_user(user1.id).await?;
     println!("   Found: {} - {}\n", fetched_user.full_name, fetched_user.email);
 
-    // Example 4: Find user by username
+
     println!("4. Finding user by username...");
     if let Some(user) = service.find_by_username("jane_smith").await? {
         println!("   Found: {} ({})\n", user.full_name, user.email);
     }
 
-    // Example 5: Get all users
+
     println!("5. Getting all users...");
     let all_users = service.get_all_users().await?;
     println!("   Total users: {}", all_users.len());
@@ -224,7 +206,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
     }
     println!();
 
-    // Example 6: Update a user
+
     println!("6. Updating user...");
     let update_dto = UpdateUserDto {
         username: None,
@@ -239,7 +221,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
         updated_user.full_name, updated_user.email
     );
 
-    // Example 7: Find users by age range
+
     println!("7. Finding users by age range (25-32)...");
     let users_in_range = service.get_users_by_age_range(25, 32).await?;
     println!("   Found {} users:", users_in_range.len());
@@ -252,7 +234,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
     }
     println!();
 
-    // Example 8: Get statistics
+
     println!("8. Getting user statistics...");
     let stats = service.get_statistics().await?;
     println!("   Total Users: {}", stats.total_users);
@@ -263,7 +245,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
         println!("   Average Age: N/A\n");
     }
 
-    // Example 9: Delete a user
+
     println!("9. Deleting user...");
     let deleted = service.delete_user(user3.id).await?;
     if deleted {
@@ -273,7 +255,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
     let all_remaining = service.get_all_users().await?;
     println!("   Remaining users: {}\n", all_remaining.len());
 
-    // Example 10: Try to get deleted user
+
     println!("10. Trying to get deleted user...");
     match service.get_user(user3.id).await {
         Ok(_) => println!("   Unexpected success!"),
@@ -288,7 +270,7 @@ async fn run_examples<R: users_module::repositories::UserRepository + Send + Syn
     Ok(())
 }
 
-/// Show the status of all applied migrations
+
 async fn show_migration_status(config: AppConfig) -> Result<(), Box<dyn std::error::Error>> {
     use core_db::MigrationRunner;
 
@@ -306,7 +288,7 @@ async fn show_migration_status(config: AppConfig) -> Result<(), Box<dyn std::err
             } else {
                 println!("✅ Found {} applied migration(s):\n", statuses.len());
 
-                // Group by module
+
                 let mut by_module: std::collections::HashMap<String, Vec<_>> = std::collections::HashMap::new();
                 for status in statuses {
                     by_module.entry(status.module.clone()).or_insert_with(Vec::new).push(status);
@@ -338,14 +320,14 @@ async fn show_migration_status(config: AppConfig) -> Result<(), Box<dyn std::err
     Ok(())
 }
 
-/// List all available migrations (not necessarily applied)
+
 async fn list_migrations() -> Result<(), Box<dyn std::error::Error>> {
     println!("📋 Available Migrations\n");
     println!("═══════════════════════════════════════════════════════════════\n");
 
     let all_migrations: Vec<_> = vec![
         users_module::USER_MIGRATIONS,
-        // Add new modules here as you create them
+
     ]
     .into_iter()
     .flatten()
@@ -356,7 +338,7 @@ async fn list_migrations() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         println!("✅ Found {} total migration(s):\n", all_migrations.len());
 
-        // Group by module
+
         let mut by_module: std::collections::HashMap<&str, Vec<_>> = std::collections::HashMap::new();
         for migration in &all_migrations {
             by_module.entry(migration.module).or_insert_with(Vec::new).push(*migration);
